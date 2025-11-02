@@ -5,12 +5,11 @@
 [build.environment]
   NODE_ENV = "production"
 
+# Single page app style - redirect all URLs to index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+# Remove the problematic redirect rule entirely
+# Netlify Functions work automatically without redirect rules

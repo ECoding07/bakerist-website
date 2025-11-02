@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAKERIST - Mabini Bakery | Track Order</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="assets/img/logo.png" type="image/x-icon">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="menu.html">Menu</a>
+            </div>
+            <div class="logo-container">
+                <img src="assets/img/logo.png" alt="BAKERIST Logo" class="logo">
+            </div>
+            <div class="nav-links">
+                <a href="tracking.html" class="active">Track Order</a>
+                <a href="#" id="auth-link">Login</a>
+                <a href="#" id="cart-icon">Cart (<span id="cart-count">0</span>)</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Tracking Header -->
+    <section class="tracking-header">
+        <div class="container">
+            <h1>Track Your Order</h1>
+            <p>Enter your order number to check the status of your delivery</p>
+        </div>
+    </section>
+
+    <!-- Tracking Form -->
+    <section class="tracking-form">
+        <div class="container">
+            <div class="tracking-card">
+                <form id="tracking-form">
+                    <div class="form-group">
+                        <label for="order-number">Order Number</label>
+                        <input type="text" id="order-number" placeholder="Enter your order number" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Track Order</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking Results -->
+    <section class="tracking-results hidden">
+        <div class="container">
+            <div class="tracking-card">
+                <h3>Order #<span id="order-id-display"></span></h3>
+                <div class="tracking-timeline">
+                    <div class="timeline-step" id="step-to-pay">
+                        <div class="step-icon">1</div>
+                        <div class="step-label">To Pay</div>
+                    </div>
+                    <div class="timeline-step" id="step-to-prepare">
+                        <div class="step-icon">2</div>
+                        <div class="step-label">To Prepare</div>
+                    </div>
+                    <div class="timeline-step" id="step-out-for-delivery">
+                        <div class="step-icon">3</div>
+                        <div class="step-label">Out for Delivery</div>
+                    </div>
+                    <div class="timeline-step" id="step-delivered">
+                        <div class="step-icon">4</div>
+                        <div class="step-label">Delivered</div>
+                    </div>
+                </div>
+                <div class="order-details">
+                    <h4>Order Details</h4>
+                    <div id="order-items">
+                        <!-- Order items will be populated via JavaScript -->
+                    </div>
+                    <div class="order-summary">
+                        <p><strong>Total Amount:</strong> ₱<span id="order-total"></span></p>
+                        <p><strong>Delivery Address:</strong> <span id="delivery-address"></span></p>
+                        <p><strong>Payment Method:</strong> <span id="payment-method"></span></p>
+                        <p><strong>Order Date:</strong> <span id="order-date"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Mabini, Batangas, Philippines</p>
+                <p>Phone: (043) 123-4567</p>
+                <p>Email: info@bakerist.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>Operating Hours</h3>
+                <p>Monday - Saturday: 6:00 AM - 8:00 PM</p>
+                <p>Sunday: 6:00 AM - 6:00 PM</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 BAKERIST - Mabini Bakery. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-tabs">
+                <button class="tab-button active" data-tab="login">Login</button>
+                <button class="tab-button" data-tab="register">Register</button>
+            </div>
+            <div id="login-form" class="auth-form">
+                <h3>Login to Your Account</h3>
+                <form id="loginForm">
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+            <div id="register-form" class="auth-form hidden">
+                <h3>Create an Account</h3>
+                <form id="registerForm">
+                    <input type="text" placeholder="Full Name" required>
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <input type="text" placeholder="Contact Number" required>
+                    <select id="barangay" required>
+                        <option value="">Select Barangay</option>
+                        <!-- Barangay options will be populated via JavaScript -->
+                    </select>
+                    <input type="text" placeholder="Sitio/Landmark" required>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Your Cart</h3>
+            <div id="cart-items">
+                <!-- Cart items will be populated via JavaScript -->
+            </div>
+            <div class="cart-total">
+                <p>Total: ₱<span id="cart-total-amount">0.00</span></p>
+                <button id="checkout-btn" class="btn btn-primary">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "bakerist-website",
+  "version": "1.0.0",
+  "description": "BAKERIST - Mabini Bakery Food Ordering System",
+  "scripts": {
+    "build": "echo 'No build process needed for static site'"
+  },
+  "dependencies": {
+    "pg": "^8.8.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1"
+  }
+}

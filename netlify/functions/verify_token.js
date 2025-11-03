@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const jwt = require('jsonwebtoken');
 
 exports.handler = async (event) => {

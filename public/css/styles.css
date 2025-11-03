@@ -810,3 +810,40 @@ body {
 .floating {
     animation: float 3s ease-in-out infinite;
 }
+
+/* Add to your existing CSS */
+.product-image {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    background: var(--light-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.image-fallback {
+    position: absolute;
+    color: var(--white);
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+    display: none;
+}
+
+.product-image img:not([src]) + .image-fallback,
+.product-image img[src=""] + .image-fallback {
+    display: block;
+}

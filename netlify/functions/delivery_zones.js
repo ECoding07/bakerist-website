@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: { rejectUnauthorized: false }
 });
 
 exports.handler = async (event) => {
@@ -65,12 +65,12 @@ exports.handler = async (event) => {
             })
         };
     }
-=======
+
 const { Pool } = require('pg');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: { rejectUnauthorized: false }
 });
 
 exports.handler = async (event) => {
@@ -133,5 +133,5 @@ exports.handler = async (event) => {
             })
         };
     }
->>>>>>> 9a54619e85a526d365c1a3c77087d038d64816b9
 };
+}

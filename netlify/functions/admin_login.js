@@ -1,4 +1,6 @@
 const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -6,20 +8,19 @@ const pool = new Pool({
 });
 
 exports.handler = async (event) => {
-    // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'GET, POST'
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE'
             },
             body: ''
         };
     }
 
-    if (event.httpMethod !== 'GET') {
+    if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
             headers: {
@@ -30,9 +31,9 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { order_id } = event.queryStringParameters;
+        const { email, password } = JSON.parse(event.body);
 
-        if (!order_id) {
+        if (!email || !password) {
             return {
                 statusCode: 400,
                 headers: {
@@ -40,37 +41,56 @@ exports.handler = async (event) => {
                 },
                 body: JSON.stringify({ 
                     success: false, 
-                    message: 'Order ID is required' 
+                    message: 'Email and password are required' 
                 })
             };
         }
 
         const result = await pool.query(
-            `SELECT o.*, u.name as user_name 
-             FROM orders o 
-             JOIN users u ON o.user_id = u.id 
-             WHERE o.id = $1`,
-            [order_id]
+            'SELECT id, name, email, password_hash, role FROM users WHERE email = $1 AND role = $2',
+            [email, 'admin']
         );
 
         if (result.rows.length === 0) {
             return {
-                statusCode: 404,
+                statusCode: 401,
                 headers: {
                     'Access-Control-Allow-Origin': '*'
                 },
                 body: JSON.stringify({ 
                     success: false, 
-                    message: 'Order not found' 
+                    message: 'Invalid admin credentials' 
                 })
             };
         }
 
-        const order = result.rows[0];
-        
-        // Parse JSON fields
-        order.items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-        order.delivery_info = typeof order.delivery_info === 'string' ? JSON.parse(order.delivery_info) : order.delivery_info;
+        const admin = result.rows[0];
+        const isValidPassword = await bcrypt.compare(password, admin.password_hash);
+
+        if (!isValidPassword) {
+            return {
+                statusCode: 401,
+                headers: {
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'Invalid admin credentials' 
+                })
+            };
+        }
+
+        const token = jwt.sign(
+            { 
+                userId: admin.id, 
+                email: admin.email, 
+                role: admin.role 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        const { password_hash, ...adminWithoutPassword } = admin;
 
         return {
             statusCode: 200,
@@ -79,12 +99,14 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ 
                 success: true, 
-                order 
+                message: 'Admin login successful',
+                token,
+                admin: adminWithoutPassword
             })
         };
 
     } catch (error) {
-        console.error('Tracking error:', error);
+        console.error('Admin login error:', error);
         return {
             statusCode: 500,
             headers: {

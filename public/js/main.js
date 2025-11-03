@@ -103,7 +103,7 @@ async function loadBarangays() {
 async function loadProducts() {
     try {
         console.log('Loading products from API...');
-        const response = await fetch('/.netlify/functions/product');
+        const response = await fetch('/.netlify/functions/products');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -164,13 +164,36 @@ function displayFeaturedProducts(products) {
     });
 }
 
-// Create product card element
+// In createProductCard function (around line 161)
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
+    
+    // Map product names to image filenames
+    const imageMap = {
+        'Pandesal': 'pandesal.jpg',
+        'Ensaymada': 'ensaymada.jpg',
+        'Spanish Bread': 'spanish-bread.jpg',
+        'Pan de Coco': 'pan-de-coco.jpg',
+        'Cheese Bread': 'cheese-bread.jpg',
+        'Kalihim (Pan de Regla)': 'kalihim.jpg',
+        'Kababayan': 'kababayan.jpg',
+        'Ube Cake': 'ube-cake.jpg',
+        'Sans Rival': 'sans-rival.jpg',
+        'Brazo de Mercedes': 'brazo-de-mercedes.jpg',
+        'Yema Cake': 'yema-cake.jpg',
+        'Chocolate Moist Cake': 'chocolate-cake.jpg',
+        'Mango Float Cake': 'mango-float.jpg',
+        'Leche Flan Cake': 'leche-flan-cake.jpg'
+    };
+    
+    const imageName = imageMap[product.name] || 'placeholder.jpg';
+    
     card.innerHTML = `
         <div class="product-image">
-            ${product.name}
+            <img src="assets/images/products/${imageName}" alt="${product.name}" 
+                 onerror="this.src='assets/images/placeholder.jpg'">
+            <div class="image-fallback">${product.name}</div>
         </div>
         <div class="product-info">
             <h3>${product.name}</h3>
@@ -188,6 +211,10 @@ function createProductCard(product) {
             </div>
         </div>
     `;
+    
+    // Rest of the event listeners...
+    return card;
+}
     
     // Add event listeners
     const minusBtn = card.querySelector('.minus');

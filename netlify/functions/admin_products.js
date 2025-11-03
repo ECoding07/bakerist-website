@@ -1,19 +1,31 @@
 const { Pool } = require('pg');
+const jwt = require('jsonwebtoken');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
+const verifyAdminToken = (token) => {
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role !== 'admin') {
+            throw new Error('Admin access required');
+        }
+        return decoded;
+    } catch (error) {
+        throw error;
+    }
+};
+
 exports.handler = async (event) => {
-    // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'GET, POST'
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE'
             },
             body: ''
         };
@@ -30,47 +42,26 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { order_id } = event.queryStringParameters;
+        const token = event.headers.authorization?.replace('Bearer ', '');
 
-        if (!order_id) {
+        if (!token) {
             return {
-                statusCode: 400,
+                statusCode: 401,
                 headers: {
                     'Access-Control-Allow-Origin': '*'
                 },
                 body: JSON.stringify({ 
                     success: false, 
-                    message: 'Order ID is required' 
+                    message: 'No token provided' 
                 })
             };
         }
+
+        verifyAdminToken(token);
 
         const result = await pool.query(
-            `SELECT o.*, u.name as user_name 
-             FROM orders o 
-             JOIN users u ON o.user_id = u.id 
-             WHERE o.id = $1`,
-            [order_id]
+            'SELECT * FROM products ORDER BY category, name'
         );
-
-        if (result.rows.length === 0) {
-            return {
-                statusCode: 404,
-                headers: {
-                    'Access-Control-Allow-Origin': '*'
-                },
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'Order not found' 
-                })
-            };
-        }
-
-        const order = result.rows[0];
-        
-        // Parse JSON fields
-        order.items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-        order.delivery_info = typeof order.delivery_info === 'string' ? JSON.parse(order.delivery_info) : order.delivery_info;
 
         return {
             statusCode: 200,
@@ -79,12 +70,26 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ 
                 success: true, 
-                order 
+                products: result.rows 
             })
         };
 
     } catch (error) {
-        console.error('Tracking error:', error);
+        console.error('Get admin products error:', error);
+        
+        if (error.message === 'Admin access required') {
+            return {
+                statusCode: 403,
+                headers: {
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'Admin access required' 
+                })
+            };
+        }
+
         return {
             statusCode: 500,
             headers: {

@@ -103,7 +103,7 @@ async function loadBarangays() {
 async function loadProducts() {
     try {
         console.log('Loading products from API...');
-        const response = await fetch('/.netlify/functions/products');
+        const response = await fetch('/.netlify/functions/product');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

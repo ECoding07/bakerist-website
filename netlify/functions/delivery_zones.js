@@ -30,28 +30,13 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { category, search } = event.queryStringParameters || {};
-
-        let query = 'SELECT * FROM products WHERE available = true';
-        let params = [];
-
-        if (category && category !== 'all') {
-            query += ' AND category = $1';
-            params.push(category);
-        }
-
-        if (search) {
-            query += params.length > 0 ? ' AND name ILIKE $2' : ' AND name ILIKE $1';
-            params.push(`%${search}%`);
-        }
-
-        query += ' ORDER BY name';
-
-        console.log('Executing query:', query, 'with params:', params);
+        console.log('Fetching delivery zones from database...');
         
-        const result = await pool.query(query, params);
+        const result = await pool.query(
+            'SELECT barangay, shipping_fee FROM delivery_zones ORDER BY barangay'
+        );
 
-        console.log(`Found ${result.rows.length} products`);
+        console.log(`Found ${result.rows.length} delivery zones`);
 
         return {
             statusCode: 200,
@@ -61,12 +46,12 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ 
                 success: true, 
-                products: result.rows 
+                barangays: result.rows 
             })
         };
 
     } catch (error) {
-        console.error('Products error:', error);
+        console.error('Delivery zones error:', error);
         return {
             statusCode: 500,
             headers: {

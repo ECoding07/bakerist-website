@@ -99,23 +99,34 @@ async function loadBarangays() {
     }
 }
 
-// Load products from database
+// In loadProducts function (around line 105)
 async function loadProducts() {
     try {
+        console.log('Loading products from API...');
         const response = await fetch('/.netlify/functions/products');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('Products API response:', data);
         
         if (data.success) {
             products = data.products;
+            console.log(`Loaded ${products.length} products`);
             displayProducts(products);
             
-            // Display featured products on home page
             if (window.location.pathname.includes('index.html')) {
                 displayFeaturedProducts(products);
             }
+        } else {
+            console.error('Products API returned error:', data.message);
         }
     } catch (error) {
         console.error('Error loading products:', error);
+        // Show user-friendly error message
+        Bakerist.showMessage('Failed to load products. Please try again.', 'error');
     }
 }
 

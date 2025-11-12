@@ -212,32 +212,34 @@ function createProductCard(product) {
         </div>
     `;
     
-    // Rest of the event listeners...
-    return card;
-}
-    
     // Add event listeners
     const minusBtn = card.querySelector('.minus');
     const plusBtn = card.querySelector('.plus');
     const quantityInput = card.querySelector('.quantity-input');
     const addToCartBtn = card.querySelector('.add-to-cart');
     
-    minusBtn.addEventListener('click', function() {
-        const currentValue = parseInt(quantityInput.value);
-        if (currentValue > 1) {
-            quantityInput.value = currentValue - 1;
-        }
-    });
+    if (minusBtn && quantityInput) {
+        minusBtn.addEventListener('click', function() {
+            const currentValue = parseInt(quantityInput.value) || 1;
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+        });
+    }
     
-    plusBtn.addEventListener('click', function() {
-        const currentValue = parseInt(quantityInput.value);
-        quantityInput.value = currentValue + 1;
-    });
+    if (plusBtn && quantityInput) {
+        plusBtn.addEventListener('click', function() {
+            const currentValue = parseInt(quantityInput.value) || 1;
+            quantityInput.value = currentValue + 1;
+        });
+    }
     
-    addToCartBtn.addEventListener('click', function() {
-        const quantity = parseInt(quantityInput.value);
-        addToCart(product.id, quantity);
-    });
+    if (addToCartBtn && quantityInput) {
+        addToCartBtn.addEventListener('click', function() {
+            const quantity = parseInt(quantityInput.value) || 1;
+            addToCart(product.id, quantity);
+        });
+    }
     
     return card;
 }
